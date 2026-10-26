@@ -1039,7 +1039,6 @@ fn set_leaf_key(state: &mut Arc<Mutex<InlineState>>, key: u64) {
     *state = Arc::new(Mutex::new(InlineState {
         text,
         editor_key: Some(key),
-        hovered_link: None,
         cleanup_senders: Vec::new(),
         ..Default::default()
     }));
@@ -1653,9 +1652,7 @@ impl Paragraph {
                 let mut highlight = mark_highlight(style, node_cx, cx);
                 if let Some(link_mark) = style.link.clone() {
                     highlight.style.color = Some(node_cx.style.link());
-                    if node_cx.style.is_link_underlined() {
-                        highlight.style.underline = Some(link_underline(&node_cx.style));
-                    }
+                    highlight.style.underline = Some(link_underline(&node_cx.style));
                     links.push((inner_range.clone(), link_mark));
                 }
                 node_highlights.push((inner_range, highlight));
@@ -2827,7 +2824,6 @@ impl Paragraph {
                 self.inline_flow_items(fade_key, fades, backgrounds, node_cx, cx),
                 node_cx.link_click_handler.clone(),
             )
-            .hover_underline(hover_link_underline(&node_cx.style))
             .editor_key(self.leaf_key())
             .into_any_element();
         }
@@ -2861,7 +2857,6 @@ impl Paragraph {
                 highlights,
                 node_cx.link_click_handler.clone(),
             )
-            .hover_underline(hover_link_underline(&node_cx.style))
             .range_backgrounds(backgrounds)
             .reveal(reveal)
             .into_any_element();
@@ -2896,7 +2891,6 @@ impl Paragraph {
                             ),
                             node_cx.link_click_handler.clone(),
                         )
-                        .hover_underline(hover_link_underline(&node_cx.style))
                         .range_backgrounds(slice_backgrounds(
                             backgrounds,
                             consumed,
@@ -2957,9 +2951,7 @@ impl Paragraph {
 
                     if let Some(mut link_mark) = style.link.clone() {
                         highlight.style.color = Some(node_cx.style.link());
-                        if node_cx.style.is_link_underlined() {
-                            highlight.style.underline = Some(link_underline(&node_cx.style));
-                        }
+                        highlight.style.underline = Some(link_underline(&node_cx.style));
 
                         // convert link references, replace link
                         if let Some(identifier) = link_mark.identifier.as_ref() {
@@ -2993,7 +2985,6 @@ impl Paragraph {
                     highlights,
                     node_cx.link_click_handler.clone(),
                 )
-                .hover_underline(hover_link_underline(&node_cx.style))
                 .range_backgrounds(slice_backgrounds(backgrounds, consumed, text_end))
                 .reveal(node_cx.reveal_at(fade_key, consumed, text_end))
                 .into_any_element(),
@@ -3087,9 +3078,7 @@ impl Paragraph {
                                 .clone(),
                         );
                         object_style.color = Some(node_cx.style.link());
-                        if node_cx.style.is_link_underlined() {
-                            object_style.underline = Some(link_underline(&node_cx.style));
-                        }
+                        object_style.underline = Some(link_underline(&node_cx.style));
                     }
                 }
                 let rendered_node = node.clone();
@@ -3155,9 +3144,7 @@ impl Paragraph {
 
                     if let Some(mut link_mark) = style.link.clone() {
                         highlight.style.color = Some(node_cx.style.link());
-                        if node_cx.style.is_link_underlined() {
-                            highlight.style.underline = Some(link_underline(&node_cx.style));
-                        }
+                        highlight.style.underline = Some(link_underline(&node_cx.style));
 
                         if let Some(identifier) = link_mark.identifier.as_ref()
                             && let Some(mark) = node_cx.link_refs.get(identifier)
@@ -3214,12 +3201,6 @@ fn block_element_id(kind: &'static str, span: Option<Span>, ix: usize) -> Elemen
 /// document; the HTML parser records no spans, so its paragraphs share one.
 fn leaf_element_id(fade_key: Option<TextLeafKey>) -> ElementId {
     fade_key.map_or_else(|| ElementId::from("p"), ElementId::from)
-}
-
-fn hover_link_underline(style: &TextViewStyle) -> Option<gpui::UnderlineStyle> {
-    style
-        .is_link_underlined_on_hover()
-        .then(|| link_underline(style))
 }
 
 /// A link's underline: a hairline in a translucent link color, so a run of

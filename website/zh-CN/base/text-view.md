@@ -267,12 +267,6 @@ cargo run -p gpui-base-examples -- text-view
 
 这个 API 复用 TextView 的水平块流渲染器。宿主仍需管理原生输入的 UTF-16 转换、无障碍集成和虚拟化。当前的字节索引几何无法表达双向文本中的光标 affinity，也无法区分软换行边界的两侧，因此还不是完整的视觉光标导航 API。
 
-## 带链接的纯文本
-
-`TextViewState::linked_text(text, links, cx)` 创建可选中的纯文本，通过 `TextViewLink::new(range, url)` 标记链接。范围使用 UTF-8 字节偏移，须按位置排序且互不重叠；无效范围会被忽略。用 `set_linked_text(text, links, cx)` 同时替换文本与链接，用 `range()` 和 `url()` 读取链接信息。通过 `TextView::new(&state)` 渲染保留的状态，`on_link_click` 可接管 URL 打开行为。
-
-`TextView::link_underline(bool)` 和 `link_underline_on_hover(bool)` 在主题解析后覆盖链接外观。Base 样式提供对应的 `TextViewStyle::with_link_underline`、`with_link_underline_on_hover` 构建方法，以及 `is_link_underlined()`、`is_link_underlined_on_hover()` 读取方法。默认始终显示下划线，悬停下划线默认关闭。
-
 ## 行内代码样式
 
 通过 `TextView::inline_code_style(StyleRefinement)` 覆盖行内代码样式。覆盖在主题、显式样式和表面颜色适配之后应用；未指定的属性保留默认值，指定的颜色在反色表面上也保持不变。

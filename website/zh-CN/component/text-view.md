@@ -343,25 +343,6 @@ markdown(source)
     })
 ```
 
-## 带链接的纯文本
-
-内容是纯文本而非 Markdown 时，可用 UTF-8 字节范围标记链接：
-
-```rust
-use gpui_kit::component::text::{TextView, TextViewLink, TextViewState};
-
-let state = cx.new(|cx| TextViewState::linked_text(
-    "Visit GPUI Kit",
-    vec![TextViewLink::new(6..14, "https://gpui-kit.com")],
-    cx,
-));
-TextView::new(&state)
-    .link_underline(false)
-    .link_underline_on_hover(true)
-```
-
-链接范围须按位置升序排列且互不重叠。无效、重叠或未对齐 UTF-8 字符边界的范围会被忽略。用 `set_linked_text(text, links, cx)` 同时替换文本与链接。`on_link_click` 可接管默认的 URL 打开行为。链接默认始终显示下划线，悬停下划线默认关闭。
-
 ## 行内代码样式
 
 通过 `TextView::inline_code_style(StyleRefinement)` 覆盖行内代码样式。覆盖在主题、显式样式和表面颜色适配之后应用；未指定的属性保留默认值，指定的颜色在反色表面上也保持不变。
