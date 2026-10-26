@@ -10,8 +10,8 @@ use gpui::{
     App, AppContext as _, Bounds, Context, Element, ElementId, Entity, EntityId, EventEmitter,
     Global, GlobalElementId, Half, Hitbox, HitboxBehavior, Hsla, InputEvent as _,
     InspectorElementId, IntoElement, LayoutId, LongPressEvent, MouseButton, MouseDownEvent,
-    MouseMoveEvent, MouseUpEvent, Pixels, Point, ScrollDelta, ScrollWheelEvent, SharedString,
-    Style, Subscription, TextLayout, TouchDragEvent, TouchPhase, WeakEntity, Window, point, px,
+    MouseMoveEvent, MouseUpEvent, Pixels, Point, ScrollDelta, ScrollEvent, SharedString, Style,
+    Subscription, TextLayout, TouchDragEvent, TouchPhase, WeakEntity, Window, point, px,
 };
 
 use crate::text_boundary::{line_range_at, word_range_at};
@@ -2694,7 +2694,7 @@ impl WindowSelectionState {
             cx.defer(move |cx| {
                 _ = window.update(cx, |_, window, cx| {
                     window.dispatch_event(
-                        ScrollWheelEvent {
+                        ScrollEvent {
                             position,
                             delta: ScrollDelta::Pixels(point(px(0.), -delta)),
                             ..Default::default()
@@ -3445,7 +3445,7 @@ fn paint_text_selection(state: &Entity<WindowSelectionState>, window: &mut Windo
     });
 
     let scroll_state = state.downgrade();
-    window.on_mouse_event(move |event: &ScrollWheelEvent, phase, window, cx| {
+    window.on_mouse_event(move |event: &ScrollEvent, phase, window, cx| {
         let Some(state) = scroll_state.upgrade() else {
             return;
         };
@@ -5160,7 +5160,7 @@ mod tests {
                 .clone();
             let offset = registration.scroll_offset;
             window.dispatch_event(
-                gpui::PlatformInput::ScrollWheel(ScrollWheelEvent {
+                gpui::PlatformInput::Scroll(ScrollEvent {
                     position: registration.bounds.center(),
                     delta: ScrollDelta::Pixels(point(px(0.), px(-20.))),
                     touch_phase: TouchPhase::Moved,
@@ -5223,7 +5223,7 @@ mod tests {
                 let previous_offset = scroll.offset();
                 cx.update(|window, cx| {
                     window.dispatch_event(
-                        gpui::PlatformInput::ScrollWheel(ScrollWheelEvent {
+                        gpui::PlatformInput::Scroll(ScrollEvent {
                             position: point(px(20.), px(20.)),
                             delta: ScrollDelta::Pixels(point(px(0.), px(-4.))),
                             touch_phase: TouchPhase::Moved,
